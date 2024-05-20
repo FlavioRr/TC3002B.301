@@ -1,7 +1,7 @@
 Folder con el dataset a utilizar:
 Google drive Folder Face Data: https://drive.google.com/drive/folders/16i_jtLB22ho3U3ZilennOaO6ANkXHKzx
 
-Cuando se trabaja con un conjunto de datos de imágenes para entrenar un modelo de inteligencia artificial, es fundamental seguir prácticas y técnicas adecuadas para asegurar que el modelo pueda generalizar bien y ofrecer resultados precisos en datos no vistos previamente. A continuación, explico en detalle las decisiones tomadas en el contexto de un dataset dividido en fotos de caras de hombres y mujeres, que cuenta con 15,000 elementos, y que fue dividido utilizando el archivo divisionDataset.py:
+Cuando se trabaja con un conjunto de datos de imágenes para entrenar un modelo de inteligencia artificial, es fundamental seguir prácticas y técnicas adecuadas para asegurar que el modelo pueda generalizar bien y ofrecer resultados precisos en datos no vistos previamente. A continuación, explico en detalle las decisiones tomadas en el contexto de un dataset dividido en fotos de caras de hombres y mujeres, que cuenta con 15,000 elementos, y que fue dividido utilizando el archivo divisionDataset.py dentro de carpeta de BenjiM3:
 
 ### 1. División del Dataset en Train y Test (70-30)
 Justificación:
