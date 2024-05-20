@@ -17,6 +17,28 @@ class Tag(IntEnum):
 	## ADD THE MISSING RESERVED WORDS, JUST FOLLOW THE NUMBER SEQUENCE ##
 	VAR = 457
 	FORWARD = 458
+	BACKWARD = 459
+	LEFT = 460
+	RIGHT = 461
+	SETX = 462
+	SETY = 463
+	SETXY = 464
+	CLEAR = 465
+	CIRCLE = 466
+	ARC = 467
+	PENUP = 468
+	PENDOWN = 469
+	COLOR = 470
+	PENWIDTH = 471
+	PRINT = 472
+	REPEAT = 473
+	IF = 474
+	IFELSE = 475
+	HOME = 476
+	NOT = 477
+	OR = 478
+	AND = 479
+	MOD = 480
 	
 class Token:
 	__tag = Tag.EOF
@@ -54,8 +76,7 @@ class Token:
 		elif self.__tag == Tag.STRING:
 			return "string constant"
 		else:
-			return "'" + chr(self.__tag) + "'" 
-			return "'" + chr(self.__tag) + "'" 
+			return "'" + chr(self.__tag) + "'"
 			
 class Lexer:
 	__peek = ' '
@@ -69,13 +90,39 @@ class Lexer:
 		self.__words["VAR"] = Token(Tag.VAR, "VAR")
 		self.__words["FORWARD"] = Token(Tag.FORWARD, "FORWARD")
 		self.__words["FD"] = Token(Tag.FORWARD, "FORWARD")
-		## ADD THE REST RESERVED WORDS, REMEMBER THAT SOME RESERVER WORDS HAVE THE SAME TAG ##
+		self.__words["BACKWARD"] = Token(Tag.BACKWARD, "BACKWARD")
+		self.__words["BK"] = Token(Tag.BACKWARD, "BACKWARD")
+		self.__words["LEFT"] = Token(Tag.LEFT, "LEFT")
+		self.__words["LT"] = Token(Tag.LEFT, "LEFT")
+		self.__words["RIGHT"] = Token(Tag.RIGHT, "RIGHT")
+		self.__words["RT"] = Token(Tag.RIGHT, "RIGHT")
+		self.__words["SETX"] = Token(Tag.SETX, "SETX")
+		self.__words["SETY"] = Token(Tag.SETY, "SETY")
+		self.__words["SETXY"] = Token(Tag.SETXY, "SETXY")
+		self.__words["HOME"] = Token(Tag.HOME, "HOME")
+		self.__words["CLEAR"] = Token(Tag.CLEAR, "CLEAR")
+		self.__words["CLS"] = Token(Tag.CLEAR, "CLEAR")
+		self.__words["ARC"] = Token(Tag.ARC, "ARC")
+		self.__words["PENUP"] = Token(Tag.PENUP, "PENUP")
+		self.__words["PU"] = Token(Tag.PENUP, "PENUP")
+		self.__words["PENDOWN"] = Token(Tag.PENDOWN, "PENDOWN")
+		self.__words["PD"] = Token(Tag.PENDOWN, "PENDOWN")
+		self.__words["COLOR"] = Token(Tag.COLOR, "COLOR")
+		self.__words["PENWIDTH"] = Token(Tag.PENWIDTH, "PENWIDTH")
+		self.__words["PRINT"] = Token(Tag.PRINT, "PRINT")
+		self.__words["REPEAT"] = Token(Tag.REPEAT, "REPEAT")
+		self.__words["IF"] = Token(Tag.IF, "IF")
+		self.__words["IFELSE"] = Token(Tag.IFELSE, "IFELSE")
+		self.__words["NOT"] = Token(Tag.NOT, "NOT")
+		self.__words["OR"] = Token(Tag.OR, "OR")
+		self.__words["AND"] = Token(Tag.AND, "AND")
+		self.__words["MOD"] = Token(Tag.MOD, "MOD")
 
-	def read(self):
+	def __read(self):
 		self.__peek = self.__input.read(1)
 	
-	def readch(self, c):
-		self.read()
+	def __readch(self, c):
+		self.__read()
 		if self.__peek != c:
 			return False
 
@@ -85,36 +132,41 @@ class Lexer:
 	def __skipSpaces(self):
 		while True:
 			if self.__peek == ' ' or self.__peek == '\t' or self.__peek == '\r' or self.__peek == '\n':
-				self.read()
+				self.__read()
 			else:
 				break
 	
 	def scan(self):
 		self.__skipSpaces()
 
-		## ADD CODE TO SKIP COMMENTS HERE ##
+		if self.__peek == '%':
+			while True:
+				self.__read()
+				if self.__peek == '\n':
+					break
+			self.__skipSpaces()
 
 		if self.__peek == '<':
-			if self.readch('='):
+			if self.__readch('='):
 				return Token(Tag.LEQ, "<=")
-			elif self.readch('>'):
+			elif self.__readch('>'):
 				return Token(Tag.NEQ, "<>")
 			else:
 				return Token(ord('<'))
 		elif self.__peek == '>':
-			if self.readch('='):
-				return Word(Tag.GEQ, ">=")
+			if self.__readch('='):
+				return Token(Tag.GEQ, ">=")
 			else:
 				return Token(ord('>'))
 		elif self.__peek == '#':
-			if self.readch('t'):
+			if self.__readch('t'):
 				return Token(Tag.TRUE, "#t")
-			elif self.readch('f'):
+			elif self.__readch('f'):
 				return Token(Tag.FALSE, "#f")
 			else:
 				return Token(ord('#'))
 		elif self.__peek == ':':
-			if self.readch('='):
+			if self.__readch('='):
 				#print("reading :=")
 				return Token(Tag.ASSIGN, ":=")
 			else:
@@ -124,29 +176,40 @@ class Lexer:
 			val = ""
 			while True:
 				val = val + self.__peek
-				self.read()
+				self.__read()
 				if self.__peek == '"':
 					break
 			
 			val = val + self.__peek
-			self.read()
+			self.__read()
 			return Token(Tag.STRING, val)
 
 		if self.__peek.isdigit():
 			val = 0
 			while True:
 				val = (val * 10) + int(self.__peek)
-				self.read()
+				self.__read()
 				if not(self.__peek.isdigit()):
 					break
-			## ADD CODE TO PROCESS DECIMAL PART HERE ##
+			if self.__peek  == '.':
+				self.__read()
+				if self.__peek.isdigit():
+					divisor = 10.0
+					while True:
+						val = val + (float(self.__peek) / divisor)
+						divisor = divisor * 10.0
+						self.__read()
+						if not(self.__peek.isdigit()):
+							break
+				else:
+					raise Exception('Lexical Exception')
 			return Token(Tag.NUMBER, val)
 
 		if self.__peek.isalpha():
 			val = ""
 			while True:
 				val = val + self.__peek.upper()
-				self.read()
+				self.__read()
 				if not(self.__peek.isalnum()):
 					break
 
